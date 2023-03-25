@@ -1,5 +1,6 @@
 ﻿USE DATABASE MY_STORE_LAB;
 
+--STORE table
 TRUNCATE TABLE IF EXISTS INSIGHTS.STORE;
 INSERT INTO INSIGHTS.STORE (
     store_id,
@@ -30,6 +31,7 @@ LEFT JOIN WCD_LAB.SAKILA.address a ON s.address_id=a.address_id
 LEFT JOIN WCD_LAB.SAKILA.city ct USING (city_id)
 LEFT JOIN WCD_LAB.SAKILA.country cn USING (country_id);
 
+-- CUSTOMERS table
 TRUNCATE TABLE IF EXISTS INSIGHTS.CUSTOMERS;
 INSERT INTO INSIGHTS.CUSTOMERS (
     customer_id,
@@ -65,6 +67,7 @@ LEFT JOIN WCD_LAB.SAKILA.address a USING (address_id)
 LEFT JOIN WCD_LAB.SAKILA.city ct USING (city_id)
 LEFT JOIN WCD_LAB.SAKILA.country cn USING (country_id);
 
+-- EMPLOYEES table
 TRUNCATE TABLE IF EXISTS INSIGHTS.EMPLOYEES;
 INSERT INTO INSIGHTS.EMPLOYEES (
     employee_id,
@@ -104,6 +107,7 @@ LEFT JOIN WCD_LAB.SAKILA.address a USING (address_id)
 LEFT JOIN WCD_LAB.SAKILA.city ct USING (city_id)
 LEFT JOIN WCD_LAB.SAKILA.country cn USING (country_id);
 
+-- FILM table
 TRUNCATE TABLE IF EXISTS INSIGHTS.FILM;
 INSERT INTO INSIGHTS.FILM (
     film_id,
@@ -147,19 +151,6 @@ LEFT JOIN WCD_LAB.SAKILA.film_category fc USING (film_id)
 LEFT JOIN WCD_LAB.SAKILA.category c ON fc.category_id=c.category_id;
 
 
--- TRUNCATE TABLE IF EXISTS INSIGHTS.CALENDAR;
--- INSERT INTO INSIGHTS.CALENDAR (
---     --transact_date date,
---     calendar_dt date,
---     day_of_wk_num,
---     day_of_wk_desc,
---     yr_num,
---     wk_num,
---     yr_wk_num,
---     mnth_num,
---     yr_mnth_num
--- );
-
 -- POPULATE FACT TABLE
 -- we first join the payment, inventory and rental tables to create a base transient table
 CREATE OR REPLACE TRANSIENT TABLE INSIGHTS.TRANS_BASE_STG AS  
@@ -186,13 +177,13 @@ SELECT
 	c.yr_wk_num
 FROM INSIGHTS.CALENDAR c
 JOIN 
-		(SELECT 
-			yr_wk_num
-		FROM INSIGHTS.CALENDAR
-		WHERE calendar_dt <=$max_dt
-		GROUP BY yr_wk_num
-		ORDER BY yr_wk_num desc
-		LIMIT 4) USING (yr_wk_num);
+    (SELECT 
+        yr_wk_num
+    FROM INSIGHTS.CALENDAR
+    WHERE calendar_dt <=$max_dt
+    GROUP BY yr_wk_num
+    ORDER BY yr_wk_num desc
+    LIMIT 4) USING (yr_wk_num);
 
 ------ build a week + store framework. The reason why we cross join week and store, is because we want to create a framework to make sure the all weeks and stores
 ------ are listed no matter there are any transaction or not in that date in the payment table.
